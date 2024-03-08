@@ -161,7 +161,7 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 module.exports = function (app) {
   app.use(
-    "/myproject-api",
+    "/api",
     createProxyMiddleware({
       target: "http://localhost:8080", // 서버 URL or localhost:portNum
       changeOrigin: true,
@@ -169,56 +169,53 @@ module.exports = function (app) {
   );
 };
 ```  
-> with the upper setting...  
-> if you call "/myproject-api" url  
-> you would go to "localhost:8080/myproject-api"  
+with the upper setting...  
+> if you call "/api" url in React project  
+> you would go to "localhost:8080/api"  
+```
+/               : static server returns index.html with React app  
+/todos          : static server returns index.html with React app  
+/api/todos      : server handles any /api/* requests using the backend implementation
+```
 
 ### `Integration Test`
 App.js in react project
 ```agsl
-import {useEffect, useState} from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
-    const [hello, setHello] = useState('');
+  const [hello, setHello] = useState("");
+  useEffect(() => {
+    fetch(`/api/test`)
+      .then((res) => res.text())        //res.json(): When getting json data from server 
+      .then((res) => setHello(res));
+  }, []);
 
-    useEffect(() => {    
-        axios.get('/myproject-api/test')
-            .then((res) => {
-                setHello(res.data);
-            })
-    }, []);
-    return (
-        <div className="App">
-            Message : {hello}
-        </div>
-    );
+  return <div>Hello React : {hello}</div>;
 }
-
 export default App;
 ```  
 
 Test Controller of spring boot
 ```agsl
-package com.demo.demoproject.controller;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+package com.jeff.todo.controller;
 
 @RestController
-public class HelloController {
+@RequestMapping("/api/test")
+public class TestController {
 
-    @GetMapping("/myproject/test")
-    public String hello() {
-        return "This message is from backend server";
-    }
+  @GetMapping
+  public String test(){
+    return "Server API test....";
+  }
 }
 ```  
 To test backend side  
 ```
 // After starting spring boot project...  
 
-localhost:8080/myproject-api/test
+localhost:8080/api/test
 ```  
 To test frontend side
 ```
@@ -281,7 +278,42 @@ To start the application
 To check the result in the following address:  
   > localhost:8080  
 
-### 7. React : useState
+### 7. Inner project within outer project : gitignore ?
+Outer Project : Spring boot  
+Inner Project : React (location in src/main/frontend)  
+
+Gitignore file is in the outer project root.  
+After inner project(react) creation, outer gitignore file needs to be modified as below:  
+```agsl
+###  Add the following script at the end(bottom) of the root gitignore script  
+
+### VS Code with React Project nested ###
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/src/main/frontend/node_modules
+/src/main/frontend/.pnp
+/src/main/frontend.pnp.js
+
+# testing
+/src/main/frontendcoverage
+
+# production
+/src/main/frontend/build
+
+# misc
+/src/main/frontend/.DS_Store
+/src/main/frontend/.env.local
+/src/main/frontend/.env.development.local
+/src/main/frontend/.env.test.local
+/src/main/frontend/.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+```  
+
+### 8. React : useState
 useState is an <span style="color:red">async function</span>.
 ```agsl
 const Todo = (props) => {
@@ -294,7 +326,7 @@ const Todo = (props) => {
     setItem({ ...item, title: e.target.value });  
     
     // Therefore, below editItem(item) does not wait for finishing setItem(~~) function.
-    // Consequently, item value is just reserved one before chaning by upper setItem()
+    // Consequently, 'item' value is just reserved one before chaning by upper setItem()
     editItem(item);
   };
   }
@@ -303,7 +335,7 @@ To use updated 'item' value...
 - use useEffect hook or   
 - call 'item' in other function : the 'item' value must be already updated by upper function(editEventHandler)  
 
-### 8. Javascript: How to change one of the objects inside an array  
+### 9. Javascript: How to change one of the objects inside an array  
 arr.map()
 ```agsl
 function App() {
@@ -330,7 +362,59 @@ function App() {
 }
 ```  
 
-### 9. Axios delete
+### 10. To create utility function with JS fetch()
+By creating utility function with JS fetch(), application can be much simple.
+
+### `To create 'api-config.js'`  
+if you use 'http-proxy-middleware' (frontend side proxy setting middle-ware), you don't need below file.
+```agsl
+let backendHost;
+
+const hostname = window && window.location && window.location.hostname;
+
+if (hostname === "localhost") {
+  backendHost = "http://localhost:8080";
+}
+
+export const API_BASE_URL = `${backendHost}`;
+
+```  
+### `To create 'ApiService.js'`
+
+```agsl
+import { API_BASE_URL } from "../apiConfig";
+
+export function call(api, method, requestData) {
+  let headers = new Headers({
+    "Content-Type": "application/json",
+  });
+  let options = {
+    headers: headers,
+    url: API_BASE_URL + api,
+    method: method,
+  };
+
+  if (requestData) {
+    // To add body(property), and change JSON to stringify
+    options.body = JSON.stringify(requestData);
+  }
+  return fetch(options.url, options)
+    .then((res) => {
+      if (res.status === 200) {
+        return res.json();
+      }
+    })
+    .catch((err) => {
+      console.log("http error!");
+      console.log(err);
+    });
+}
+
+
+```
+
+
+### 11. Axios delete
 Unlike axios.post() and axios.put(), the 2nd param to axios.delete() is the Axios options, not the request body.  
 
 To send a request body with a DELETE request, you should use the <span style="color:red">data</span> option.  
@@ -340,7 +424,7 @@ const res = await axios.delete('https://httpbin.org/delete', { data: { answer: 4
 res.data.json; // { answer: 42 }
 ```
 
-### 10. Authentication & Authorization  
+### 12. Authentication & Authorization  
 ### `Authentication vs Authorization`  
 > Authentication  
 > > Matter of login  
@@ -368,8 +452,8 @@ res.data.json; // { answer: 42 }
   Security and scaling issues can be resolved by useing digital signature JWT(Json Web Token)  
   Token contents : header, payload, signature  
 
-### 11 Spring Security with JWT  
-### `11.1 Dependency Setting`  
+### 13 Spring Security with JWT  
+### `13.1 Dependency Setting`  
 ```agsl
 // To add the following dependencies in 'build.gradle' file  
 	 
@@ -382,7 +466,7 @@ runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 implementation 'io.jsonwebtoken:jjwt-gson:0.11.5'
 ```  
 
-### `11.2 To Setup Authentication Layer`  
+### `13.2 To Setup Authentication Layer`  
 To create files : UserEntity, UserRepository, UserService, and UserDTO/UserController
 
 ```agsl
@@ -513,7 +597,7 @@ public class UserController {
 }
 ```  
 
-### `11.3 To Setup Spring Security and JWT`  
+### `13.3 To Setup Spring Security and JWT`  
 To create files : TokenProvider, JwtAuthenticationFilter, WebSecurityConfig, and TodoController(Modification)  
 ```agsl
 // TokenProvider =========================  

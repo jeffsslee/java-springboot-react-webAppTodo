@@ -1,0 +1,6 @@
+/* smallest device: stop width shrink */
+@media only screen and (max-width: 360px) {
+  body {
+    width: 360px;
+  }
+}
