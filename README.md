@@ -411,11 +411,10 @@ export function call(api, method, requestData) {
 }
 
 
-```
-
+```  
 
 ### 11. Axios delete
-Unlike axios.post() and axios.put(), the 2nd param to axios.delete() is the Axios options, not the request body.  
+Unlikely axios.post() and axios.put(), axios.delete() needs the 2nd param with the type : { data : {}}.   
 
 To send a request body with a DELETE request, you should use the <span style="color:red">data</span> option.  
 ```agsl
@@ -438,12 +437,12 @@ res.data.json; // { answer: 42 }
 - Basic Auth  
   Adding base64 base encoded string(id/pwd) to every http requests
   > [problems]  
-  	Logout issue(Always Login action)  
+  	Logout issue(No login action; every request is only for login)  
   	Security issue(Handling with id/pwd)  
   	Scaling issue (Every request need every auth; causing server overload)  
 
 - Token base Auth  
-  Encoded token is replied after the first login(with id/pwd) request; after then, only the token is attached to every request  
+  The server reply the encoded token when receiving the first login(with id/pwd) request from client; after then, only the token is attached to every request from the same client.  
   Security issue is resolved.  
   > [problems]  
     Scaling issue (Every request need every auth; causing server overload)  
@@ -453,20 +452,8 @@ res.data.json; // { answer: 42 }
   Token contents : header, payload, signature  
 
 ### 13 Spring Security with JWT  
-### `13.1 Dependency Setting`  
-```agsl
-// To add the following dependencies in 'build.gradle' file  
-	 
-// Spring Security
-implementation 'org.springframework.boot:spring-boot-starter-security'
-// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
-implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
-// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
-runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-implementation 'io.jsonwebtoken:jjwt-gson:0.11.5'
-```  
 
-### `13.2 To Setup Authentication Layer`  
+### `13.1 To Setup User Authentication Layer`  
 To create files : UserEntity, UserRepository, UserService, and UserDTO/UserController
 
 ```agsl
@@ -597,6 +584,19 @@ public class UserController {
 }
 ```  
 
+### `13.2 Dependency Setting`  
+```agsl
+// To add the following dependencies in 'build.gradle' file  
+	 
+// Spring Security
+implementation 'org.springframework.boot:spring-boot-starter-security'
+// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
+runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+implementation 'io.jsonwebtoken:jjwt-gson:0.11.5'
+```  
+
 ### `13.3 To Setup Spring Security and JWT`  
 To create files : TokenProvider, JwtAuthenticationFilter, WebSecurityConfig, and TodoController(Modification)  
 ```agsl
@@ -718,7 +718,7 @@ public class WebSecurityConfig {
 //        .antMatchers("/todo_api","/todo_api/auth/**").permitAll()
 //        .anyRequest().authenticated();
         .authorizeHttpRequests(
-            auth -> auth.requestMatchers("/todo-api", "/todo-api/auth/**").permitAll()
+            auth -> auth.requestMatchers("/", "/api/auth/**").permitAll()
 //                .requestMatchers("/todo_api/login").permitAll()
 //                .requestMatchers("/todo_api/test/**").permitAll()
                 .anyRequest().authenticated()
