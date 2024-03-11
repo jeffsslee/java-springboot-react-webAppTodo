@@ -887,7 +887,7 @@ function App() {
 export default App;
 ```  
 
-### `14g.2 To use Optional Chaning Operator(?.)`
+### `14.2 To use Optional Chaning Operator(?.)`
 [Object?.property]  
 Even though the object before the operator "?." is undefined or null, the operator does not return 'error', and just return 'undefined'.
 
