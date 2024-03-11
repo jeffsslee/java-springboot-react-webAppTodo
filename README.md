@@ -811,12 +811,12 @@ public class TodoController {
 }
 ```  
 
-### 13 UI Glitches  
+### 14 UI Glitches  
 React UI Glitches  
 - Unnecessary UI display symptom while loading a specific page, or waiting to get information from other server.
 
 How To Solve
-### `13.1 To use flag variables`
+### `14.1 To use flag variables`
 
 ```agsl
 function App() {
@@ -887,7 +887,7 @@ function App() {
 export default App;
 ```  
 
-### `13.2 To use Optional Chaning Operator(?.)`
+### `14g.2 To use Optional Chaning Operator(?.)`
 [Object?.property]  
 Even though the object before the operator "?." is undefined or null, the operator does not return 'error', and just return 'undefined'.
 
