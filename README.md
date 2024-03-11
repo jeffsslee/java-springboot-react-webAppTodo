@@ -809,10 +809,105 @@ public class TodoController {
     }
   }
 }
+```  
+
+### 13 UI Glitches  
+React UI Glitches  
+- Unnecessary UI display symptom while loading a specific page, or waiting to get information from other server.
+
+How To Solve
+### `13.1 To use flag variables`
+
+```agsl
+function App() {
+  const [items, setItems] = useState([]);
+  // flag variables
+  const [loading, setLoading] = useState(true);
+
+  const requestOptions = {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  };
+
+  useEffect(() => {
+    call("/api/todo", "GET", null).then((res) => {
+      setItems(res.data);
+      setLoading(false);
+    });
+  }, []);
+
+  let todoItems = items?.length > 0 && (
+    <Paper sx={{ padding: "8px" }}>
+      <List>
+        {items?.map((item) => (
+          <Todo
+            item={item}
+            key={item.id}
+            deleteItem={deleteItem}
+            editItem={editItem}
+          />
+        ))}
+      </List>
+    </Paper>
+  );
+
+  let todoListPage = (
+    <StyledDisplayBox>
+      <StyledDisplayInnerBox>
+        <AddTodo addItem={addItem} />
+        {todoItems}
+      </StyledDisplayInnerBox>
+    </StyledDisplayBox>
+  );
+
+  // while loading
+  let loadingPage = (
+    <Typography
+      variant="h4"
+      color={"primary.main"}
+      sx={{
+        margin: "300px auto",
+      }}
+    >
+      on Loanding....
+    </Typography>
+  );
+
+  let content = todoListPage;
+
+  if (!loading) content = todoListPage;
+
+  return (
+    <StyledBox>
+      <NavBar />
+      {content}
+    </StyledBox>
+  );
+}
+export default App;
+```  
+
+### `13.2 To use Optional Chaning Operator(?.)`
+[Object?.property]  
+Even though the object before the operator "?." is undefined or null, the operator does not return 'error', and just return 'undefined'.
+
+Normally, 'nullObject.property' returns 'error' which would make React UI glitches.
+```agsl
+  let todoItems = items?.length > 0 && (
+    <Paper sx={{ padding: "8px" }}>
+      <List>
+        {items?.map((item) => (
+          <Todo
+            item={item}
+            key={item.id}
+            deleteItem={deleteItem}
+            editItem={editItem}
+          />
+        ))}
+      </List>
+    </Paper>
+  );
 ```
-
-
-
 
 
 ## Reference

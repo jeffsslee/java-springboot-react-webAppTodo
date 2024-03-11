@@ -27,7 +27,6 @@ public class UserController {
 
   @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
-
     try {
       if (userDTO == null || userDTO.getPassword() == null) {
         throw new RuntimeException("Invalid password value");
@@ -55,7 +54,7 @@ public class UserController {
   public ResponseEntity<?> authenticate(@RequestBody UserDTO userDTO) {
 
     UserEntity userEntity = userService.getByCredentials(userDTO.getUsername(), userDTO.getPassword(), passwordEncoder);
-
+    log.info("userEntity : {}", userEntity);
     if (userEntity != null) {
       final String token = tokenProvider.create(userEntity);
       UserDTO userDTOresponse = UserDTO.builder()

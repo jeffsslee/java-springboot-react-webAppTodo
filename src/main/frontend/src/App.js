@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { Box, Grid, List, Paper, styled } from "@mui/material";
+import { Box, Grid, List, Paper, Typography, styled } from "@mui/material";
 import Todo from "./components/Todo";
 import AddTodo from "./components/AddTodo";
 import NavBar from "./components/NavBar";
@@ -41,6 +41,7 @@ function App() {
     //   done: false,
     // },
   ]);
+  const [loading, setLoading] = useState(true);
 
   const requestOptions = {
     method: "GET",
@@ -51,7 +52,10 @@ function App() {
     // fetch(`/api/todo`, requestOptions)
     //   .then((res) => res.json())
     //   .then((res) => setItems(res.data));
-    call("/api/todo", "GET", null).then((res) => setItems(res.data));
+    call("/api/todo", "GET", null).then((res) => {
+      setItems(res.data);
+      setLoading(false);
+    });
   }, []);
 
   const addItem = (item) => {
@@ -97,7 +101,22 @@ function App() {
     </StyledDisplayBox>
   );
 
+  // while loading
+  let loadingPage = (
+    <Typography
+      variant="h4"
+      color={"primary.main"}
+      sx={{
+        margin: "300px auto",
+      }}
+    >
+      on Loanding....
+    </Typography>
+  );
+
   let content = todoListPage;
+
+  if (!loading) content = todoListPage;
 
   return (
     <StyledBox>

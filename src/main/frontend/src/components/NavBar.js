@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import React from "react";
+import { signout } from "../ApiService";
 
 const NavBar = () => {
   return (
@@ -21,7 +22,7 @@ const NavBar = () => {
       </Typography>
       <Button
         color="inherit"
-        // onClick={signout}
+        onClick={signout}
         sx={{
           position: "absolute",
           right: "48px",
