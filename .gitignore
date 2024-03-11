@@ -35,3 +35,28 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### VS Code with React Project nested ###
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/src/main/frontend/node_modules
+/src/main/frontend/.pnp
+/src/main/frontend.pnp.js
+
+# testing
+/src/main/frontendcoverage
+
+# production
+/src/main/frontend/build
+
+# misc
+/src/main/frontend/.DS_Store
+/src/main/frontend/.env.local
+/src/main/frontend/.env.development.local
+/src/main/frontend/.env.test.local
+/src/main/frontend/.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
